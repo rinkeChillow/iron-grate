@@ -1,5 +1,6 @@
 package com.rinke_.irongrate;
 
+import com.rinke_.irongrate.block.ModBlocks;
 import net.fabricmc.api.ModInitializer;
 
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ public class IronGrate implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-
+        ModBlocks.registerModBlocks();
 
 		LOGGER.info("hehe boi");
 	}
