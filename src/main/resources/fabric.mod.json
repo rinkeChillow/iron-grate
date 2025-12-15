@@ -1,0 +1,40 @@
+{
+	"schemaVersion": 1,
+	"id": "irongrate",
+	"version": "0.1.0",
+	"name": "Iron Grate",
+	"description": "adds the iron grate block to the game, a counterpart to the copper grate block",
+	"authors": [
+		"rinke_"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/user/rinke",
+		"sources": ""
+	},
+	"license": "MIT",
+	"icon": "assets/irongrate/bruh.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": [
+			"com.rinke_.irongrate.IronGrate"
+		],
+		"fabric-datagen": [
+			"com.rinke_.irongrate.IronGrateDataGenerator"
+		],
+      "client": [
+        "com.rinke_.irongrate.IronGrateClient"
+      ]
+	},
+	"mixins": [
+		"irongrate.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
