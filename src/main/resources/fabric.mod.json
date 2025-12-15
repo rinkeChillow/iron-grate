@@ -9,7 +9,8 @@
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/user/rinke",
-		"sources": ""
+        "modpage": "https://modrinth.com/project/iron-grate",
+		"sources": "https://github.com/rinkeChillow/iron-grate"
 	},
 	"license": "MIT",
 	"icon": "assets/irongrate/bruh.png",
