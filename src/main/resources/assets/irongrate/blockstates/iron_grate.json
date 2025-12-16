@@ -1,0 +1,7 @@
+{
+  "variants":{
+    "": {
+        "model": "irongrate:block/iron_grate"
+    }
+  }
+}

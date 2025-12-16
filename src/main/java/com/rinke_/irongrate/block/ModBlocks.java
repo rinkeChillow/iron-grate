@@ -1,12 +1,15 @@
 package com.rinke_.irongrate.block;
 
 import com.rinke_.irongrate.IronGrate;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.Block;
 import net.minecraft.block.MapColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemGroups;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -41,5 +44,9 @@ public class ModBlocks {
 
     public static void registerModBlocks(){
         IronGrate.LOGGER.info("blocks from " + IronGrate.MOD_ID + " is now loading...");
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> {
+            entries.add(ModBlocks.IRON_GRATE);
+        });
     }
 }
