@@ -1,5 +1,4 @@
 package com.rinke_.irongrate;
-
 import com.rinke_.irongrate.block.ModBlocks;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
