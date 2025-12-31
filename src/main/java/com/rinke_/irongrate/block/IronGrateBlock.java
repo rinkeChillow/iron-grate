@@ -10,6 +10,7 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
 import net.minecraft.block.Waterloggable;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.util.math.BlockPos;
 
@@ -64,5 +65,14 @@ public class IronGrateBlock extends Block implements Waterloggable {
             world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+    }
+    //turnig off abiant shading (the darkening effect that only solid blocks do)
+    @Override
+    public boolean hasSidedTransparency(BlockState state) {
+        return true;
+    }
+    @Override
+    public float getAmbientOcclusionLightLevel(BlockState state, BlockView world, BlockPos pos) {
+        return 1.0F;
     }
 }
