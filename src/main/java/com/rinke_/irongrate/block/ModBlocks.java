@@ -9,6 +9,7 @@ import net.minecraft.block.MapColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.sound.BlockSoundGroup;
@@ -45,7 +46,7 @@ public class ModBlocks {
         IronGrate.LOGGER.info("blocks from " + IronGrate.MOD_ID + " is now loading...");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(entries -> {
-            entries.add(ModBlocks.IRON_GRATE);
+            entries.addBefore(Items.CHAIN,ModBlocks.IRON_GRATE);
         });
     }
 }
