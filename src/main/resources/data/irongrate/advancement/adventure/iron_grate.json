@@ -1,0 +1,37 @@
+{
+  "parent": "minecraft:adventure/root",
+  "criteria": {
+    "get_iron_grate": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": ["irongrate:iron_grate"]
+          }
+        ]
+      }
+    }
+  },
+  "display": {
+    "icon": {
+      "id": "irongrate:iron_grate",
+      "count": 1
+    },
+    "title": {
+      "text": "They Come in Iron Too?"
+    },
+    "description": {
+      "text": "Obtain or Craft an Iron Grate"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "requirements": [
+    [
+      "get_iron_grate"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
