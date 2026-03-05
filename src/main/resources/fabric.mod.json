@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "irongrate",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"name": "Iron Grate",
 	"description": "adds the iron grate block to the game, a counterpart to the copper grate block",
 	"authors": [
