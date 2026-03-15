@@ -12,12 +12,16 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 
 public class ModBlocks {
     public static final Block IRON_GRATE = registerBlock("iron_grate",
             new IronGrateBlock(AbstractBlock.Settings.create()
+                            .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(IronGrate.MOD_ID, "iron_grate")))
+
                             .strength(3.0F, 6.0F)
                             .sounds(BlockSoundGroup.COPPER_GRATE)
                             .mapColor(MapColor.IRON_GRAY)
@@ -38,7 +42,7 @@ public class ModBlocks {
 
     private static void registerBlockItem(String name, Block block){
         Registry.register(Registries.ITEM, Identifier.of(IronGrate.MOD_ID, name),
-                new BlockItem(block, new Item.Settings()));
+                new BlockItem(block, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(IronGrate.MOD_ID, name))).useBlockPrefixedTranslationKey()));
 
     }
 
