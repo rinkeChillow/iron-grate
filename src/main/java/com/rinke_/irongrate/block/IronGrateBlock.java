@@ -70,7 +70,7 @@ public class IronGrateBlock extends Block implements Waterloggable {
         }
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
-    //turnig off abiant shading (the darkening effect that only solid blocks do)
+    //turnig off ambiant shading (the darkening effect that only solid blocks do)
     @Override
     public boolean hasSidedTransparency(BlockState state) {
         return true;
