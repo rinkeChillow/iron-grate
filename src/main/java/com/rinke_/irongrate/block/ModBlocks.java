@@ -30,7 +30,7 @@ public class ModBlocks {
                             .isValidSpawn(Blocks::never)
                             .isRedstoneConductor(Blocks::never)
                             .isSuffocating(Blocks::never)
-                            .isViewBlocking(Blocks::never)
+                            .isViewBlocking((state, level, pos, a) -> false)
             )
     );
 

@@ -14,7 +14,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "irongrate:iron_grate_from_stonecutting"
+        "recipes": "irongrate:iron_grate_from_stonecutting"
       }
     }
   },

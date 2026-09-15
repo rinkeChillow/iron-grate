@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "irongrate",
-	"version": "1.26.1",
+	"version": "1.26.3",
 	"name": "Iron Grate",
 	"description": "adds the iron grate block to the game, a counterpart to the copper grate block",
 	"authors": [
@@ -30,8 +30,8 @@
 		"irongrate.mixins.json"
 	],
 	"depends": {
-        "fabricloader": ">=0.17.3",
-        "minecraft": ">=26.1 <=26.1.2",
+        "fabricloader": ">=0.17.5",
+        "minecraft": "26.3",
         "java": ">=25",
         "fabric-api": "*"
 	},

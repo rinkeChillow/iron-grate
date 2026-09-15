@@ -54,6 +54,14 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
+
+	// Minecraft 26.3 declares javaVersion 25 and calls Java 25 APIs (e.g. Math.powExact).
+	// Pin a real GA 25 toolchain so the run tasks never inherit whatever JVM Gradle
+	// happens to be started with - the "25-loom" EA build reports 25 but is missing them.
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
 }
 
 jar {
