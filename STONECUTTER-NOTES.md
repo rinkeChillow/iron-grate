@@ -5,20 +5,43 @@ this repo or recovered from the plugin jar; where something is unverified it say
 
 ## Status
 
+The yarn layer is **done and verified**. All five versions (1.21, 1.21.3, 1.21.4,
+1.21.5, 1.21.6) build from one source tree with `gradlew build`, and each jar was
+checked against the branch it replaces.
+
 | | |
 |---|---|
 | Branch | `stonecutter`, based on `1.21.6` |
-| Verified | source directives for the yarn layer; `1.21.6` builds **bytecode-identical** to the `1.21.6` branch |
-| Not verified | anything requiring the Stonecutter plugin to actually run (see Blocker) |
+| Layer done | yarn: 1.21, 1.21.3, 1.21.4, 1.21.5, 1.21.6 |
+| Layer not started | Mojang: 26.1, 26.3 |
 
-### Blocker
+### Verification results
 
-The Stonecutter plugin could not be executed in this session: adding it to
-`settings.gradle` makes Gradle fetch and run third-party code from
-`maven.kikugie.dev`, which the sandbox refuses ("Code from External"). So the
-version declarations here are written but **never run**. No multi-version build,
-no per-version jars, no in-game test list. That needs a session allowed to
-execute the plugin.
+Resources — every file in each reference branch is present in the built jar and
+**byte-identical**, and `fabric.mod.json` carries the right `version` and
+`depends.minecraft` for each:
+
+| MC | reference branch | resources | fabric.mod.json |
+|---|---|---|---|
+| 1.21 | `master` | identical | `1.0.0`, `>=1.21 <=1.21.1` |
+| 1.21.3 | `1.21.3` | identical | `1.3.0`, `1.21.3` |
+| 1.21.4 | `1.21.4` | identical | `1.4.0`, `1.21.4` |
+| 1.21.5 | `1.21.5` | identical | `1.5.0`, `1.21.5` |
+| 1.21.6 | `1.21.6` | identical | `1.6.0`, `>=1.21.6 <=1.21.11` |
+
+Source — Stonecutter output compared against each reference branch, with the inert
+directive comments stripped:
+
+| MC | result |
+|---|---|
+| 1.21.5 | exact match |
+| 1.21.4 | one comment typo (`abiant` to `ambiant`, fixed upstream in 1.21.5) |
+| 1.21.3 | same typo, plus the reference carries a dead `WorldAccess` import that the generated source correctly omits |
+| 1.21 | same typo, plus `WorldAccess` import ordering |
+| 1.21.6 | active version — see gotcha 10; proven bytecode-identical to its branch separately |
+
+All remaining differences are comments, import order, or a dead import. Nothing
+behavioural.
 
 ## Version pin
 
@@ -73,10 +96,33 @@ Two things that bit me:
 - **There is no `chiseledBuild` task in 0.9.8.** No string matching `chisel`
   appears anywhere in the jar. That name is from older releases. Aggregation now
   goes through `stonecutter.tasks.named(name, filter)`, which returns a
-  node-to-TaskProvider map. The actual aggregate task name still needs to be read
-  off a real `gradlew tasks` run.
+  node-to-TaskProvider map. In practice you do not need it for a plain build:
+  plain `gradlew build` from the root builds every version, because each version
+  is an ordinary Gradle subproject.
 - **Default file handlers are `java, scala, groovy, gradle, json5`** (plus kotlin,
   shader, hash groups). Plain `.json` is *not* handled. See gotcha 4.
+
+### Confirmed project layout
+
+Verified by running it, not guessed:
+
+```
+settings.gradle                      stonecutter { create(rootProject) { versions ... } }
+stonecutter.gradle                   the CONTROLLER - stonecutter.active '1.21.6'
+build.gradle                         the SHARED PER-VERSION script (centralScript default)
+gradle.properties                    shared keys only (loom_version, group, archive name)
+versions/<ver>/gradle.properties     per-version keys - these DO resolve
+overlays/<name>/...                  resource overlays for unpreprocessable changes
+src/                                 the one shared source tree
+```
+
+The root project uses `stonecutter.gradle` as its build script, which frees the
+root `build.gradle` to be the script every `versions/*` subproject runs. The
+`versions/<ver>` directories otherwise stay empty — adding a `gradle.properties`
+is also what makes git track them.
+
+`gradlew build` from the root builds every version. Per-version:
+`gradlew :1.21.3:build`. Jars land in `versions/<ver>/build/libs/`.
 
 ### Directive syntax (verbatim from the README)
 
@@ -200,7 +246,38 @@ the right shape; it is also the part I could not run.
 7. **Gradle 9 removed `-c` / `--settings-file`.** To build with an alternative
    settings file you must swap the file. Relevant because the Stonecutter
    `settings.gradle` cannot be used by a plain single-version build.
-8. **Directives are genuinely inert.** Verified: with all directives in place the
+8. **The generated controller is Kotlin and does not translate.** Stonecutter
+   writes `stonecutter.gradle.kts` containing `stonecutter active "1.21.6"` — the
+   Kotlin infix form. Copy that into a Groovy `stonecutter.gradle` and Gradle fails
+   with *"Could not get unknown property 'active'"*, because Groovy parses it as a
+   property read. Groovy needs `stonecutter.active '1.21.6'`, and set
+   `kotlinController = false` in the `create` block so the `.kts` is not regenerated.
+9. **Resource overlays are the answer to gotchas 4 and 5.** What worked: move the
+   version-varying resources out of `src/main/resources` into `overlays/<name>/`,
+   then pick one per version in the shared build script:
+
+   ```groovy
+   sourceSets.main.resources.srcDir rootProject.file(
+           stonecutter.eval(project.minecraft_version, ">=1.21.3") ? "overlays/recipes-modern" : "overlays/recipes-legacy")
+   ```
+
+   `stonecutter.eval` is available on the per-version extension, and
+   `project.minecraft_version` comes from `versions/<ver>/gradle.properties`, so no
+   extra Stonecutter API is needed. This handles both the JSON content change and
+   the file move cleanly.
+10. **The active version has no generated source.** There is no
+    `build/generated/stonecutter` for whatever `stonecutter.active` points at —
+    that version compiles the working tree directly. So a verification script that
+    diffs generated-vs-reference reports every file "missing" for the active
+    version. Verify that one against a reference *build* instead.
+11. **Wrong resources build silently.** Before the overlays went in, `1.21` built
+    successfully and produced a jar containing the 1.21.6 recipe format and the
+    1.21.6 asset path — both wrong for 1.21, neither flagged. JSON is not validated
+    at build time and a missing model is a runtime problem. Nothing in the build
+    output hints at it. **This is the single most dangerous thing here**: a green
+    multi-version build does not mean the old versions work. Diff jar resources
+    against the reference branch every time.
+12. **Directives are genuinely inert.** Verified: with all directives in place the
    `1.21.6` build is bytecode-identical to the `1.21.6` branch build — all six
    classes identical under `javap -p -c`, all resources identical modulo line
    endings. Jar size differs by 1 byte (comment/line shift). So adding directives
