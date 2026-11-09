@@ -283,6 +283,43 @@ the right shape; it is also the part I could not run.
    endings. Jar size differs by 1 byte (comment/line shift). So adding directives
    to a working tree is safe and reviewable.
 
+13. **Never hand-edit `stonecutter.active`.** Editing the controller file directly
+    changes the *declared* active version without rewriting the working tree, so
+    the comment state desyncs and the build fails with a pile of confusing
+    "cannot find symbol" errors. Use the real tasks (their names contain spaces):
+    `"Set active project to <ver>"`, `"Refresh active project"` (reprocesses
+    comments for the current active version — this is the repair tool), and
+    `"Reset active project"`, which returns the tree to `vcsVersion` and is
+    explicitly meant to be run **before committing**. Committing while switched
+    records flipped comments.
+14. **Stonecutter warns that Groovy buildscripts are the awkward path.** Every
+    invocation prints "Stonecutter is used with Groovy buildscripts / Stonecutter
+    requires a more complex Gradle setup than typical Java projects". It works
+    (this whole layer is Groovy), but Kotlin is the supported route — worth
+    weighing for Portal Glimpse before committing to Groovy.
+15. **Dev client and dev server share `versions/<ver>/run/`,** so running both at
+    once makes them fight over `latest.log` / `debug.log`. Harmless, but give them
+    separate run directories if you run them together often.
+
+### The payoff, demonstrated
+
+Iron Grate declared `"environment": "client"` in `fabric.mod.json` — on every
+branch, since forever. The effect on a dedicated server: the block and its recipe
+are never registered server-side, so the crafting output slot stays empty, and
+creative-picking the item kills the connection with
+`DecoderException: Failed to decode packet 'serverbound/minecraft:set_creative_mode_slot'`
+because the client sends an item id the server has no registry entry for.
+Singleplayer always worked, because the integrated server lives inside the client.
+
+Changing it to `"environment": "*"` fixed it, confirmed on a real dedicated server
+(mod loaded, `Found new data pack irongrate`, and the mod's own advancement fired
+for a connected player).
+
+The point for Portal Glimpse: that was **one edit to one shared file**, and it
+landed in all six version jars at once, verified. Before Stonecutter it would have
+been the same edit cherry-picked across six branches, with six chances to miss one.
+That is the case for doing this.
+
 ## Verification harness (reuse this on Portal Glimpse)
 
 Build the reference from a **detached** worktree so no branch ref can be dirtied:

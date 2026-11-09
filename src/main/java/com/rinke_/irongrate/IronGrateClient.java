@@ -7,8 +7,8 @@ import net.minecraft.client.render.BlockRenderLayer;
 //?}
 //? if <1.21.6 {
 /*import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
-import net.minecraft.client.render.RenderLayer;*/
-//?}
+import net.minecraft.client.render.RenderLayer;
+*///?}
 
 public class IronGrateClient implements ClientModInitializer {
     @Override
@@ -23,8 +23,8 @@ public class IronGrateClient implements ClientModInitializer {
         /*BlockRenderLayerMap.INSTANCE.putBlock(
                 ModBlocks.IRON_GRATE,
                 RenderLayer.getCutout()
-        );*/
-        //?}
+        );
+        *///?}
 
     }
 }

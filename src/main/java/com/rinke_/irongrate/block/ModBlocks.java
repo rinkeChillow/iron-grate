@@ -50,8 +50,8 @@ public class ModBlocks {
                 new BlockItem(block, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(IronGrate.MOD_ID, name))).useBlockPrefixedTranslationKey()));
                 //?}
                 //? if <1.21.3 {
-                /*new BlockItem(block, new Item.Settings()));*/
-                //?}
+                /*new BlockItem(block, new Item.Settings()));
+                *///?}
 
     }
 

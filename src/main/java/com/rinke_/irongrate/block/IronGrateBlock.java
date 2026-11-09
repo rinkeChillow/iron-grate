@@ -20,8 +20,8 @@ import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 //?}
 //? if <1.21.3 {
-/*import net.minecraft.world.WorldAccess;*/
-//?}
+/*import net.minecraft.world.WorldAccess;
+*///?}
 
 public class IronGrateBlock extends Block implements Waterloggable {
 
@@ -92,8 +92,8 @@ public class IronGrateBlock extends Block implements Waterloggable {
             world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
         return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
-    }*/
-    //?}
+    }
+    *///?}
     //turnig off ambiant shading (the darkening effect that only solid blocks do)
     @Override
     public boolean hasSidedTransparency(BlockState state) {
