@@ -14,7 +14,7 @@
 	},
 	"license": "MIT",
 	"icon": "assets/irongrate/bruh.png",
-	"environment": "client",
+	"environment": "*",
 	"entrypoints": {
 		"main": [
 			"com.rinke_.irongrate.IronGrate"
