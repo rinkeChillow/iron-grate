@@ -12,7 +12,7 @@ import net.minecraft.item.ItemGroups;
 import net.minecraft.item.Items;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-//? if >=1.21.3 {
+//? if >=1.21.2 {
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 //?}
@@ -22,7 +22,7 @@ import net.minecraft.util.Identifier;
 public class ModBlocks {
     public static final Block IRON_GRATE = registerBlock("iron_grate",
             new IronGrateBlock(AbstractBlock.Settings.create()
-                            //? if >=1.21.3 {
+                            //? if >=1.21.2 {
                             .registryKey(RegistryKey.of(RegistryKeys.BLOCK, Identifier.of(IronGrate.MOD_ID, "iron_grate")))
                             //?}
 
@@ -46,10 +46,10 @@ public class ModBlocks {
 
     private static void registerBlockItem(String name, Block block){
         Registry.register(Registries.ITEM, Identifier.of(IronGrate.MOD_ID, name),
-                //? if >=1.21.3 {
+                //? if >=1.21.2 {
                 new BlockItem(block, new Item.Settings().registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(IronGrate.MOD_ID, name))).useBlockPrefixedTranslationKey()));
                 //?}
-                //? if <1.21.3 {
+                //? if <1.21.2 {
                 /*new BlockItem(block, new Item.Settings()));
                 *///?}
 

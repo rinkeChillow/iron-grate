@@ -39,7 +39,7 @@ dependencies {
 // comment syntax, and the 1.21.4 item-model change is a file move, not an edit.
 // Pick a resource overlay per version instead. See STONECUTTER-NOTES.md gotchas 4 and 5.
 sourceSets.main.resources.srcDir rootProject.file(
-		stonecutter.eval(project.minecraft_version, ">=1.21.3") ? "overlays/recipes-modern" : "overlays/recipes-legacy")
+		stonecutter.eval(project.minecraft_version, ">=1.21.2") ? "overlays/recipes-modern" : "overlays/recipes-legacy")
 sourceSets.main.resources.srcDir rootProject.file(
 		stonecutter.eval(project.minecraft_version, ">=1.21.4") ? "overlays/itemmodel-modern" : "overlays/itemmodel-legacy")
 

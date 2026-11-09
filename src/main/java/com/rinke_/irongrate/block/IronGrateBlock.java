@@ -10,16 +10,16 @@ import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
 import net.minecraft.block.Waterloggable;
-//? if >=1.21.3 {
+//? if >=1.21.2 {
 import net.minecraft.util.math.random.Random;
 //?}
 import net.minecraft.world.BlockView;
 import net.minecraft.util.math.BlockPos;
-//? if >=1.21.3 {
+//? if >=1.21.2 {
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.ScheduledTickView;
 //?}
-//? if <1.21.3 {
+//? if <1.21.2 {
 /*import net.minecraft.world.WorldAccess;
 *///?}
 
@@ -62,7 +62,7 @@ public class IronGrateBlock extends Block implements Waterloggable {
     }
     // water fluid ticking
     @Override
-    //? if >=1.21.3 {
+    //? if >=1.21.2 {
     public BlockState getStateForNeighborUpdate(
             BlockState state,
             WorldView world,
@@ -79,7 +79,7 @@ public class IronGrateBlock extends Block implements Waterloggable {
         return super.getStateForNeighborUpdate(state, world, tickView, pos, direction, neighborPos, neighborState, random);
     }
     //?}
-    //? if <1.21.3 {
+    //? if <1.21.2 {
     /*public BlockState getStateForNeighborUpdate(
             BlockState state,
             Direction direction,

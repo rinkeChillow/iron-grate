@@ -301,6 +301,43 @@ the right shape; it is also the part I could not run.
     once makes them fight over `latest.log` / `debug.log`. Harmless, but give them
     separate run directories if you run them together often.
 
+### A skipped version hides a boundary — the most transferable lesson here
+
+Iron Grate had no 1.21.2 branch; the repo jumped 1.21 to 1.21.3. So the
+`1.21 -> 1.21.3` diff bundled together changes that actually landed at *different*
+versions, and every one of them looked like a single `1.21.3` boundary. Adding a
+1.21.2 node proved three of the four predicates wrong:
+
+| Change | Looked like | Actually |
+|---|---|---|
+| `getStateForNeighborUpdate` signature | `>=1.21.3` | **`>=1.21.2`** |
+| `Settings.registryKey(...)` | `>=1.21.3` | **`>=1.21.2`** |
+| recipe `"M": {"item": x}` to `"M": x` | `>=1.21.3` | **`>=1.21.2`** |
+| `models/item/` to `items/` | `>=1.21.4` | `>=1.21.4` (correct) |
+
+How each was caught matters, because only one was loud:
+
+- The two Java ones **failed the compile** the moment a 1.21.2 node existed.
+- The recipe one is **silent**. It builds clean and ships a 1.21.2 jar with a
+  recipe 1.21.2 cannot parse. I caught it only by extracting a vanilla recipe from
+  the 1.21.2 server jar in the Loom cache and comparing the shape:
+
+  ```bash
+  jar xf ~/.gradle/caches/fabric-loom/1.21.2/minecraft-extracted_server.jar \
+      data/minecraft/recipe/iron_bars.json
+  ```
+
+  The item-model boundary was confirmed the same way, by counting entries under
+  `assets/minecraft/items/` vs `assets/minecraft/models/item/` per version: 0/1833
+  at 1.21.2 and 1.21.3, 1385/1076 at 1.21.4.
+
+**For Portal Glimpse:** the branch-per-version model cannot reveal a boundary in a
+version you never branched. When you convert, enumerate every MC version in the
+supported range, not just the ones that have branches, and add nodes for the gaps.
+Then check each boundary against *vanilla's own data*, not against your diffs —
+your diffs only tell you something changed somewhere between two branches you
+happen to have.
+
 ### The payoff, demonstrated
 
 Iron Grate declared `"environment": "client"` in `fabric.mod.json` — on every
