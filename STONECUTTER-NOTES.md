@@ -5,17 +5,27 @@ this repo or recovered from the plugin jar; where something is unverified it say
 
 ## Status
 
-The yarn layer is **done and verified**. All five versions (1.21, 1.21.3, 1.21.4,
-1.21.5, 1.21.6) build from one source tree with `gradlew build`, and each jar was
-checked against the branch it replaces.
+The yarn layer is **done, verified, and shipped**. All seven versions (1.21,
+1.21.1, 1.21.2, 1.21.3, 1.21.4, 1.21.5, 1.21.6) build from one source tree with
+`gradlew build`, each jar was checked against the branch it replaces where one
+exists, and all seven are published on Modrinth as the `1.x` line.
+
+The Mojang layer (26.1, 26.3) was **not** converted. Those two stayed as ordinary
+git branches and were fixed and published by hand. So the two-layer shape in
+"The layer decision" below is reasoned, not run — see the caveat there.
 
 | | |
 |---|---|
 | Branch | `stonecutter`, based on `1.21.6` |
-| Layer done | yarn: 1.21, 1.21.3, 1.21.4, 1.21.5, 1.21.6 |
-| Layer not started | Mojang: 26.1, 26.3 |
+| Layer done | yarn: 1.21, 1.21.1, 1.21.2, 1.21.3, 1.21.4, 1.21.5, 1.21.6 |
+| Layer not converted | Mojang: 26.1, 26.3 - built from their own git branches |
 
 ### Verification results
+
+These are the five versions that had a reference branch to compare against;
+`1.21.1` and `1.21.2` are nodes added during the conversion and have no
+pre-existing branch, so they were checked against vanilla's own data instead
+(see "A skipped version hides a boundary").
 
 Resources — every file in each reference branch is present in the built jar and
 **byte-identical**, and `fabric.mod.json` carries the right `version` and
@@ -166,20 +176,20 @@ Java, across the yarn layer:
 
 | Break | File | Boundary |
 |---|---|---|
-| `Settings.registryKey(...)` required on block + item | `ModBlocks.java` | `>=1.21.3` |
-| `getStateForNeighborUpdate` signature; `WorldAccess` to `WorldView` + `ScheduledTickView` + `Random` | `IronGrateBlock.java` | `>=1.21.3` |
+| `Settings.registryKey(...)` required on block + item | `ModBlocks.java` | `>=1.21.2` |
+| `getStateForNeighborUpdate` signature; `WorldAccess` to `WorldView` + `ScheduledTickView` + `Random` | `IronGrateBlock.java` | `>=1.21.2` |
 | `BlockRenderLayerMap` moved package, became static, `RenderLayer.getCutout()` to `BlockRenderLayer.CUTOUT` | `IronGrateClient.java` | `>=1.21.6` |
 
-So the whole yarn layer needs **two predicates**: `>=1.21.3` and `>=1.21.6`.
+So the whole yarn layer needs **two predicates**: `>=1.21.2` and `>=1.21.6`.
 `IronGrate.java`, `IronGrateDataGenerator.java` and `ExampleMixin.java` are
-identical across all five 1.21.x versions. Java is identical across 1.21.3 /
-1.21.4 / 1.21.5.
+identical across all seven 1.21.x versions. Java is identical across 1.21.2 /
+1.21.3 / 1.21.4 / 1.21.5.
 
 Non-Java, across the yarn layer:
 
 | Change | Where | Boundary |
 |---|---|---|
-| `"M": {"item": "x"}` becomes `"M": "x"` | both `data/irongrate/recipe/*.json` | `>=1.21.3` |
+| `"M": {"item": "x"}` becomes `"M": "x"` | both `data/irongrate/recipe/*.json` | `>=1.21.2` |
 | `models/item/iron_grate.json` **deleted**, `items/iron_grate.json` **added** | assets | `>=1.21.4` |
 | `version` + `depends.minecraft` range | `fabric.mod.json` | every version |
 
@@ -217,6 +227,12 @@ layers can live in **one** git branch and one Gradle build as two Stonecutter
 branches, each with its own build script and source root. That is almost certainly
 the right shape; it is also the part I could not run.
 
+**Caveat, stated plainly:** the second layer was never built. 26.1 and 26.3 were
+fixed and released from their own git branches. So the `branch(name) { ... }` +
+`branchScript` route is recovered from the jar's signatures and reasoned from how
+Gradle resolves plugins — not demonstrated. On Portal Glimpse, prove the two-branch
+shape builds *before* moving any source into it.
+
 ## Gotchas
 
 1. **One Loom version per Gradle build.** `loom_version` differs across the
@@ -232,7 +248,7 @@ the right shape; it is also the part I could not run.
    `Math.powExact` and dies in `LevelRenderer.<clinit>`.
 4. **Plain `.json` is not preprocessable.** Only `json5` is handled by default,
    and even with a handler registered the directive comments survive into the
-   output, which would make Minecraft JSON invalid. The recipe change at 1.21.3
+   output, which would make Minecraft JSON invalid. The recipe change at 1.21.2
    therefore needs a per-version resource dir, `replacements`, or datagen — not a
    directive.
 5. **A preprocessor cannot add or delete files.** The 1.21.4 item-model move
@@ -258,7 +274,7 @@ the right shape; it is also the part I could not run.
 
    ```groovy
    sourceSets.main.resources.srcDir rootProject.file(
-           stonecutter.eval(project.minecraft_version, ">=1.21.3") ? "overlays/recipes-modern" : "overlays/recipes-legacy")
+           stonecutter.eval(project.minecraft_version, ">=1.21.2") ? "overlays/recipes-modern" : "overlays/recipes-legacy")
    ```
 
    `stonecutter.eval` is available on the per-version extension, and
@@ -399,3 +415,35 @@ Iron Grate is ~630 lines of `src` across 70 files, of which only 4 are Java. At
 - **Land the equivalence harness first**, then convert one version at a time,
   proving bytecode equivalence at each step. That is the only way to keep an
   11k-line migration honest.
+
+## Conclusions — what this rehearsal settled
+
+Short version, for the Portal Glimpse decision:
+
+1. **Do it.** The payoff is real and was demonstrated here: one edit to one shared
+   file (`"environment": "client"` to `"*"`) shipped correctly into seven version
+   jars at once. The branch-per-version alternative is that same edit cherry-picked
+   seven times, with seven chances to miss one.
+2. **Two layers, split on build regime** — the (Loom plugin id, mappings, Java
+   version) triple. Not on how much the source churns. PG should re-check whether
+   its 1.21.5 split is a build-regime boundary; if it is only churn, PG collapses
+   to two layers too.
+3. **Resources are the hard part, not Java.** Half the distinct changes here were
+   JSON, and the only two Stonecutter genuinely cannot express were both
+   resource-shaped. Inventory resource changes and added/deleted files first.
+4. **Enumerate every MC version in range, not just the ones with branches.**
+   Adding a 1.21.2 node proved three of four predicates wrong. A boundary inside a
+   version you never branched is invisible.
+5. **Check boundaries against vanilla's own data**, not against your branch diffs.
+   A diff tells you something changed somewhere between two branches; vanilla tells
+   you exactly where.
+6. **Land the equivalence harness before converting anything.** `javap -p -c` plus
+   a resource diff against a detached worktree. It is cheap and it is the only
+   reason any of the above is trustworthy.
+7. **A green build proves nothing about old versions.** Gotcha 11 is the one to
+   remember.
+8. **Use Kotlin buildscripts on PG.** Groovy works — this whole layer is Groovy —
+   but the plugin warns against it on every invocation and the generated controller
+   is Kotlin. At 11k lines, take the supported path.
+
+Pin **0.9.8** for the conversion; revisit 0.10 once it has mileage.
