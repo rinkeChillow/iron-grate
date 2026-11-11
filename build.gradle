@@ -3,7 +3,7 @@ plugins {
 	id 'maven-publish'
 }
 
-version = project.mod_version
+version = "${project.mod_version}+${project.minecraft_version}"
 group = project.maven_group
 
 base {
@@ -54,6 +54,13 @@ java {
 
 	sourceCompatibility = JavaVersion.VERSION_25
 	targetCompatibility = JavaVersion.VERSION_25
+
+	// Minecraft 26.x needs a real GA 25 toolchain - without this the run and compile
+	// tasks inherit whatever JVM Gradle started with. See the 26.3 branch.
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+		vendor = JvmVendorSpec.ADOPTIUM
+	}
 }
 
 jar {
